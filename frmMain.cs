@@ -34,9 +34,12 @@ namespace Mqtt_Client
 
             //以下增加了接收到的消息内容颜色不同的功能
             receiveTxtBox.SelectionColor = Color.Red;
-            receiveTxtBox.SelectedText = tradeTime+ " 收到消息：";
+            receiveTxtBox.SelectedText = tradeTime+","+e.Topic +"：";
             receiveTxtBox.SelectionColor = Color.DarkCyan;
             receiveTxtBox.AppendText(msg + "\r\n");
+            this.receiveTxtBox.Focus();//让文本框获取焦点 
+            this.receiveTxtBox.Select(this.receiveTxtBox.TextLength, 0);//设置光标的位置到文本尾
+            this.receiveTxtBox.ScrollToCaret();//滚动到控件光标处
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -133,7 +136,7 @@ namespace Mqtt_Client
         private void unSubScribe_click(object sender, EventArgs e)
         {
             client.Unsubscribe(new string[] { txtSubscribe.Text });
-            receiveTxtBox.AppendText("取消订阅" + txtSubscribe.Text);
+            receiveTxtBox.AppendText("取消订阅" + txtSubscribe.Text+"\r\n");
         }
 
         /// <summary>
@@ -147,7 +150,7 @@ namespace Mqtt_Client
             {
                 // 订阅主题"/home/temperature" 消息质量为 0 
                 client.Subscribe(new string[] { txtSubscribe.Text }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
-                receiveTxtBox.AppendText("订阅" + txtSubscribe.Text);
+                receiveTxtBox.AppendText("订阅" + txtSubscribe.Text+"\r\n");
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.ToString());
@@ -183,8 +186,12 @@ namespace Mqtt_Client
             SetConfigValue("user", txtUser.Text);
             SetConfigValue("password", txtPass.Text);
             SetConfigValue("subscribe", txtSubscribe.Text);
+            SetConfigValue("subscribe1", txtSubscribe1.Text);
+            SetConfigValue("subscribe2", txtSubscribe2.Text);
             SetConfigValue("publish", txtPublish.Text);
             SetConfigValue("lastMsg", sendTxtBox.Text);
+            SetConfigValue("publish1", txtPublish1.Text);
+            SetConfigValue("lastMsg1", sendTxtBox1.Text);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -194,8 +201,69 @@ namespace Mqtt_Client
             txtUser.Text = GetConfigValue("user");
             txtPass.Text = GetConfigValue("password");
             txtSubscribe.Text = GetConfigValue("subscribe");
+            txtSubscribe1.Text = GetConfigValue("subscribe1");
+            txtSubscribe2.Text = GetConfigValue("subscribe2");
             txtPublish.Text = GetConfigValue("publish");
-            sendTxtBox.Text = GetConfigValue("lastMsg"); 
+            sendTxtBox.Text = GetConfigValue("lastMsg");
+            txtPublish1.Text = GetConfigValue("publish1");
+            sendTxtBox1.Text = GetConfigValue("lastMsg1");
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            receiveTxtBox.Text = "";
+        }
+
+        private void unSubScribe1_Click(object sender, EventArgs e)
+        {
+            client.Unsubscribe(new string[] { txtSubscribe1.Text });
+            receiveTxtBox.AppendText("取消订阅" + txtSubscribe1.Text + "\r\n");
+        }
+
+        private void unSubScribe2_Click(object sender, EventArgs e)
+        {
+            client.Unsubscribe(new string[] { txtSubscribe2.Text });
+            receiveTxtBox.AppendText("取消订阅" + txtSubscribe2.Text + "\r\n");
+        }
+
+        private void subscribe1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 订阅主题"/home/temperature" 消息质量为 0 
+                client.Subscribe(new string[] { txtSubscribe1.Text }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                receiveTxtBox.AppendText("订阅" + txtSubscribe1.Text + "\r\n");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void subscribe2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 订阅主题"/home/temperature" 消息质量为 0 
+                client.Subscribe(new string[] { txtSubscribe2.Text }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+                receiveTxtBox.AppendText("订阅" + txtSubscribe2.Text + "\r\n");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void publish1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                client.Publish(txtPublish1.Text, Encoding.UTF8.GetBytes(sendTxtBox1.Text.Trim()), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
     }
 }
